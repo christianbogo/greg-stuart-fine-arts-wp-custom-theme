@@ -1,0 +1,338 @@
+/*
+Theme Name: Greg Stuart Custom Theme
+Theme URI: https://your-greg-stuart-site.com/
+Author: Your Name
+Author URI: https://your-website.com/
+Description: Custom theme for Greg Stuart, replicating a React design.
+Version: 1.0.0
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Tags: custom-theme, responsive-layout
+Text Domain: gregstuart-custom-theme
+*/
+
+/* === Import from your index.css === */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-y: scroll;
+  background-image: linear-gradient(to bottom, #ffffff, #e0e6ea);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* In WordPress, #root doesn't exist by default.
+   The body tag or a main wrapper inside your templates (like #page or #content)
+   will serve a similar purpose for overall layout.
+   Adjust selectors if they were targeting #root directly. */
+/*
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+*/
+
+/* The .page class can be added to your main content wrapper in templates like page.php */
+.page {
+  flex: 1;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+body,
+h1,
+h2,
+h3,
+p,
+ul,
+li {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  /* font-family: sans-serif; */ /* Overridden by the more specific one above */
+  line-height: 1.6;
+  color: #333;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+html {
+  box-sizing: border-box;
+}
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  width: 100%;
+  font-size: 1.2rem;
+  color: #777;
+}
+
+button,
+input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+  /* Added common button inputs */
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover,
+input[type="button"]:hover,
+input[type="reset"]:hover,
+input[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+button:focus,
+input[type="button"]:focus,
+input[type="reset"]:focus,
+input[type="submit"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
+}
+
+.admin-sign-in-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  text-align: center;
+}
+
+.admin-sign-in-container h1 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.admin-sign-in-container p {
+  color: #555;
+  margin-bottom: 20px;
+}
+
+/* === Import from your navbar.css === */
+
+.navbar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 0;
+  background-color: transparent; /* This might be overridden by body background if not careful */
+  position: relative; /* Changed from fixed/sticky for initial simplicity, adjust if needed */
+  /* top: 0; */ /* Only if sticky or fixed */
+  /* left: 0; */ /* Only if sticky or fixed */
+  /* right: 0; */ /* Only if sticky or fixed */
+  z-index: 1000; /* WordPress admin bar is typically 99999 */
+}
+
+.navbar-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.navbar-row-top {
+  padding-bottom: 1rem;
+}
+
+.header-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* cursor: pointer; */ /* The <a> tag will handle the cursor */
+}
+
+.logo-placeholder {
+  height: 100px;
+  width: 100px;
+  /* background-color: #eee; */ /* Example placeholder style */
+  /* opacity: 0; */ /* Removed as WP handles logo display */
+  /* animation: fade-in 0.5s forwards; */ /* Removed for WP logo */
+  margin-bottom: 1rem;
+}
+
+/* @keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+} */
+
+.logo {
+  height: auto; /* Let WP Customizer settings and CSS max-height/width control this */
+  max-height: 100px; /* Match your React CSS */
+  width: auto;
+  max-width: 100%; /* Ensure it's responsive */
+  margin-bottom: 1rem;
+  /* opacity: 0; */ /* Removed, WP will display it directly */
+  /* animation: fade-in 0.5s forwards; */ /* Removed */
+}
+
+.title {
+  font-size: 3rem;
+  font-family: "Bowlby One SC", sans-serif; /* Ensure this font is loaded via functions.php */
+  text-align: center;
+  white-space: nowrap;
+  color: #333; /* Ensure title has color if not inheriting properly */
+}
+
+.fine-arts-desktop {
+  display: inline;
+}
+
+.fine-arts-mobile {
+  display: none;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-links li {
+  /* This is styling the <li> elements generated by wp_nav_menu */
+  margin: 0 1.5rem;
+}
+
+.nav-link {
+  /* This class is now applied to the <a> tags by the custom walker */
+  text-decoration: none;
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #007bff;
+}
+
+.nav-link-active {
+  /* This class is now applied to the active <a> tag by the custom walker */
+  color: #007bff;
+  font-weight: bold; /* Example: make active link bolder */
+}
+
+.navbar-row-bottom {
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Vertically align items if they have different heights */
+  padding-top: 1rem;
+  width: 100%;
+}
+
+.navbar-row-bottom::before,
+.navbar-row-bottom::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid #ccc;
+  max-width: 300px; /* Optional: constrain the line width */
+}
+
+.navbar-row-bottom::before {
+  margin-right: 1rem;
+}
+
+.navbar-row-bottom::after {
+  margin-left: 1rem;
+}
+
+/* WordPress Admin Bar Overlap Fix */
+body.admin-bar .navbar {
+  /* top: 32px; */ /* Adjust if you make the navbar fixed/sticky */
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 1.5rem 0 1rem 0; /* Adjusted padding slightly */
+  }
+
+  .logo {
+    max-height: 60px; /* Match your React CSS */
+    margin-bottom: 0.5rem;
+  }
+
+  .title {
+    font-size: 2rem;
+    white-space: normal;
+  }
+
+  .fine-arts-desktop {
+    display: none;
+  }
+
+  .fine-arts-mobile {
+    display: inline;
+  }
+
+  .nav-links li {
+    margin: 0 0.75rem;
+  }
+
+  .nav-link {
+    font-size: 0.9rem; /* Adjust font size for smaller screens if needed */
+  }
+
+  .navbar-row-bottom {
+    padding-top: 0.5rem;
+  }
+
+  .navbar-row-bottom::before,
+  .navbar-row-bottom::after {
+    margin-right: 0.5rem;
+    margin-left: 0.5rem;
+  }
+
+  /* WordPress Admin Bar Overlap Fix for Mobile */
+  body.admin-bar .navbar {
+    /* top: 46px; */ /* Adjust if you make the navbar fixed/sticky */
+  }
+}
+
+/* Additional WordPress specific styles if needed */
+.screen-reader-text {
+  border: 0;
+  clip: rect(1px, 1px, 1px, 1px);
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute !important;
+  width: 1px;
+  word-wrap: normal !important;
+}
