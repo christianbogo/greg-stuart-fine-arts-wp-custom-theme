@@ -19,12 +19,17 @@ get_header();
 		<div class="sketches-page page">
 			<header class="sketches-header">
 				<h1 class="sketches-title">Greg's Sketches</h1>
-				<p class="sketches-intro">
-					<?php
-					// Intro text for the sketches page.
-					echo esc_html__('Sketches represent a glimpse into the creative process - moments of inspiration captured without the pressure of perfection. They are train-of-thought explorations, shared to offer a more intimate look at the artist behind the work.', 'gregstuart-custom-theme');
-					?>
-				</p>
+				<div class="sketches-intro"> <?php // Changed <p> to <div> for Block Editor compatibility ?>
+    <?php
+    // Display content entered in the WP Admin editor for this page.
+    // This needs to be within The Loop for the page.
+    if ( have_posts() ) :
+        while ( have_posts() ) : the_post();
+            the_content();
+        endwhile;
+    endif;
+    ?>
+</div>
 			</header>
 
 			<?php

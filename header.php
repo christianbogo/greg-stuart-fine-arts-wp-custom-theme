@@ -44,8 +44,8 @@
 					}
 					?>
 					<span class="title">
-						Greg Stuart
-						<span class="fine-arts-desktop"> Fine Arts</span>
+						GREG STUART
+						<span class="fine-arts-desktop"> FINE ARTS</span>
 						<span class="fine-arts-mobile">
 							<br />
 							Fine Arts

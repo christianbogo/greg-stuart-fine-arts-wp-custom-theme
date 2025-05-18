@@ -14,9 +14,8 @@ Text Domain: gregstuart-custom-theme
 /* === Import from your index.css === */
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family: "Inter Tight", sans-serif; /* UPDATED */
+  font-weight: 100; /* ADDED for Thin variant */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-y: scroll;
@@ -24,6 +23,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  /* line-height and color are already in another body rule, which is fine */
 }
 
 /*
@@ -178,10 +178,12 @@ input[type="submit"]:focus {
 
 .title {
   font-size: 3rem;
-  font-family: "Bowlby One SC", sans-serif; /* Ensure this font is loaded via functions.php */
+  font-family: "Anton", sans-serif; /* UPDATED */
+  font-weight: 400; /* ADDED - Anton is often bold by default, this ensures it */
   text-align: center;
   white-space: nowrap;
   color: #333;
+  letter-spacing: 0.05em; /* Optional: if you like a bit of spacing with Anton */
 }
 
 .fine-arts-desktop {
@@ -563,7 +565,8 @@ input[type="submit"]:focus {
   left: 0;
   width: 100%;
   color: white;
-  font-family: "Fira Sans Condensed", sans-serif; /* Ensure font is available */
+  font-family: "Fira Sans Condensed", sans-serif; /* Ensure this is the enqueued font */
+  font-weight: 400; /* ADDED to be explicit for Regular weight */
   padding: 0.75rem 1rem;
   font-size: 1rem;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
@@ -686,13 +689,14 @@ input[type="submit"]:focus {
 .sketches-image {
   /* Applied to img tag by the_post_thumbnail */
   display: block;
-  width: auto;
-  max-width: 100%;
-  height: auto;
+  width: auto; /* This allows it to shrink if height is constrained */
+  max-width: 100%; /* Prevents it from overflowing its container's width */
+  height: auto; /* Maintains aspect ratio, but can lead to very tall images */
+  max-height: 20rem;
   border-radius: 4px;
   border: 2px solid #ffffff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  object-fit: contain;
+  object-fit: contain; /* Ensures the whole image is visible, scaling down if necessary */
 }
 
 .sketches-image-placeholder {
@@ -713,6 +717,8 @@ input[type="submit"]:focus {
 }
 
 .sketches-item-title {
+  font-family: "Fira Sans Condensed", sans-serif; /* ADDED */
+  font-weight: 400; /* UPDATED to Regular weight */
   font-size: 1.1rem;
   font-weight: bold;
   margin-bottom: 0.25rem;
@@ -764,14 +770,6 @@ input[type="submit"]:focus {
 }
 
 /* === Hero Section Styles (from hero.css) === */
-.hero {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4rem 2rem;
-  gap: 2rem;
-}
 
 .hero .text-container {
   text-align: center;
@@ -784,23 +782,30 @@ input[type="submit"]:focus {
 }
 
 .hero .image-container {
-  width: 100%;
   max-width: 800px;
-  background-color: #f0f0f0; /* Placeholder background */
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: inline-block;
+  line-height: 0;
+  background-color: #f0f0f0;
   border: 5px solid #ffffff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 4px;
-  min-height: 200px;
+  overflow: hidden;
 }
 
 .hero .image-container img.hero-image {
   width: 100%;
   height: auto;
   display: block;
-  border-radius: 0px;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  gap: 2rem;
+  text-align: center;
 }
 
 .hero .hero-image-placeholder {
@@ -874,49 +879,35 @@ input[type="submit"]:focus {
   padding: 5px;
 }
 
-/* Responsive adjustments for the 5-item grid */
-@media (max-width: 1024px) and (min-width: 769px) {
-  /* Tablet: 3 then 2 */
+/* Apply 3+2 pattern from 1024px all the way down to a smaller breakpoint (e.g., 481px) */
+@media (max-width: 1024px) {
   .artwork-grid .artwork-item {
-    width: calc(33.333% - 7px);
+    /* Items 1, 2, 3 */
+    width: calc(33.333% - 7px); /* Approx 1/3rd width (100%/3 - adjusted gap) */
     padding-bottom: calc(33.333% - 7px);
   }
   .artwork-grid .artwork-item:nth-child(4),
   .artwork-grid .artwork-item:nth-child(5) {
-    width: calc(50% - 5px);
+    /* Items 4, 5 */
+    width: calc(50% - 5px); /* Approx 1/2 width (100%/2 - adjusted gap) */
     padding-bottom: calc(50% - 5px);
   }
 }
 
-@media (max-width: 768px) {
-  /* Smaller tablets / large phones: 2 columns */
-  .artwork-grid .artwork-item {
-    width: calc(50% - 5px);
-    padding-bottom: calc(50% - 5px);
+/* At very small screens (e.g., 480px and below), stack them if the 3+2 becomes too cramped. */
+/* You can adjust this breakpoint or remove it if you want 3+2 to always try to fit. */
+@media (max-width: 300px) {
+  .artwork-grid .artwork-item,
+  .artwork-grid .artwork-item:nth-child(4), /* Resetting specific widths for 4th and 5th */
+  .artwork-grid .artwork-item:nth-child(5) {
+    width: 100%; /* Each item takes full width */
+    padding-bottom: 100%; /* Maintain square aspect ratio */
   }
 }
-
-@media (max-width: 480px) {
-  /* Small phones: 1 column */
-  .artwork-grid .artwork-item {
-    width: 100%;
-    padding-bottom: 100%;
-  }
-  /* Alternative: 2 columns on small phones
-    .artwork-grid .artwork-item {
-        width: calc(50% - 5px);
-        padding-bottom: calc(50% - 5px);
-    }
-  */
-}
-
 /* === Sketch Highlight Section Styles (from sketch-highlight.css) === */
 .sketch-highlight {
   margin-top: 3rem;
   padding: 2rem 1rem;
-  background-color: #f9f9f9;
-  border-top: 1px solid #eaeaea;
-  border-bottom: 1px solid #eaeaea;
 }
 
 .sketch-highlight-title {
@@ -960,6 +951,8 @@ input[type="submit"]:focus {
   width: auto;
   max-width: 100%;
   height: auto;
+  margin: 0 auto;
+  max-height: 20rem;
   border-radius: 4px;
   border: 2px solid #ffffff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);

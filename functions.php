@@ -47,9 +47,16 @@ add_action( 'after_setup_theme', 'gregstuart_setup' );
  * Enqueue scripts and styles.
  */
 function gregstuart_scripts_styles() {
-	wp_enqueue_style( 'gregstuart-google-fonts', 'https://fonts.googleapis.com/css2?family=Bowlby+One+SC&display=swap', array(), null );
+	// Enqueue Google Fonts: Anton (for site title), Fira Sans Condensed (for artwork titles/captions), Inter Tight (for body text)
+	wp_enqueue_style( 
+		'gregstuart-google-fonts', 
+		'https://fonts.googleapis.com/css2?family=Anton&family=Fira+Sans+Condensed:wght@400&family=Inter+Tight:wght@400&display=swap', 
+		array(), 
+		null 
+	);
+
     wp_enqueue_style( 'font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css', array(), '6.5.1' );
-	wp_enqueue_style( 'gregstuart-main-style', get_stylesheet_uri(), array(), GREGSTUART_VERSION );
+	wp_enqueue_style( 'gregstuart-main-style', get_stylesheet_uri(), array('gregstuart-google-fonts'), GREGSTUART_VERSION ); // Added 'gregstuart-google-fonts' as a dependency
 
 	// GLightbox Integration
 	wp_enqueue_style( 'glightbox-css', get_template_directory_uri() . '/assets/css/glightbox.min.css', array(), '3.3.1' );
@@ -126,11 +133,5 @@ class GregStuart_Nav_Walker extends Walker_Nav_Menu {
 
         $output .= $indent . apply_filters( 'walker_nav_menu_start_el', $item_output, $item, $depth, $args );
     }
-
-    // The end_el function is often not needed unless specific <li> closing markup is required.
-    // If you had custom logic in end_el, it would be preserved or commented if unused.
-    // function end_el( &$output, $item, $depth = 0, $args = null ) {
-    //  $output .= "</li>\n";
-    // }
 }
 ?>

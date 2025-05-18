@@ -18,14 +18,21 @@ get_header();
 		<div class="page gallery">
 			<header class="gallery-header">
 				<h1 class="gallery-title">Greg's Paintings</h1>
-				<p class="gallery-intro">
-					<?php
-					// This intro text could be made editable via the page content in WP Admin if desired.
-					// For now, it's static, similar to the original React component's structure.
-					// Consider updating this text to be more specific to paintings if the current text is a placeholder.
-					echo esc_html__('Sketches represent a glimpse into the creative process - moments of inspiration captured without the pressure of perfection. They are train-of-thought explorations, shared to offer a more intimate look at the artist behind the work.', 'gregstuart-custom-theme');
-					?>
-				</p>
+				<div class="gallery-intro"> <?php // Changed <p> to <div> to better accommodate block editor content ?>
+    <?php
+    // Display content entered in the WP Admin editor for this page.
+    // This needs to be within The Loop.
+    if ( have_posts() ) :
+        while ( have_posts() ) : the_post();
+            the_content();
+        endwhile;
+        // No need to rewind or reset post data here if this is the only loop for page content.
+    else :
+        // Optionally, handle the case where no content is found for the page.
+        // echo '<p>No introductory content has been set for this page.</p>';
+    endif;
+    ?>
+</div>
 			</header>
 
 			<?php
