@@ -134,4 +134,140 @@ class GregStuart_Nav_Walker extends Walker_Nav_Menu {
         $output .= $indent . apply_filters( 'walker_nav_menu_start_el', $item_output, $item, $depth, $args );
     }
 }
+
+function cptui_register_my_cpts_artwork() {
+
+	/**
+	 * Post Type: Artworks.
+	 */
+
+	$labels = [
+		"name" => esc_html__( "Artworks", "gregstuart-custom-theme" ),
+		"singular_name" => esc_html__( "Artwork", "gregstuart-custom-theme" ),
+		"menu_name" => esc_html__( "My Artworks", "gregstuart-custom-theme" ),
+		"all_items" => esc_html__( "All Artworks", "gregstuart-custom-theme" ),
+		"add_new" => esc_html__( "Add new", "gregstuart-custom-theme" ),
+		"add_new_item" => esc_html__( "Add new Artwork", "gregstuart-custom-theme" ),
+		"edit_item" => esc_html__( "Edit Artwork", "gregstuart-custom-theme" ),
+		"new_item" => esc_html__( "New Artwork", "gregstuart-custom-theme" ),
+		"view_item" => esc_html__( "View Artwork", "gregstuart-custom-theme" ),
+		"view_items" => esc_html__( "View Artworks", "gregstuart-custom-theme" ),
+		"search_items" => esc_html__( "Search Artworks", "gregstuart-custom-theme" ),
+		"not_found" => esc_html__( "No Artworks found", "gregstuart-custom-theme" ),
+		"not_found_in_trash" => esc_html__( "No Artworks found in trash", "gregstuart-custom-theme" ),
+		"parent" => esc_html__( "Parent Artwork:", "gregstuart-custom-theme" ),
+		"featured_image" => esc_html__( "Featured image for this Artwork", "gregstuart-custom-theme" ),
+		"set_featured_image" => esc_html__( "Set featured image for this Artwork", "gregstuart-custom-theme" ),
+		"remove_featured_image" => esc_html__( "Remove featured image for this Artwork", "gregstuart-custom-theme" ),
+		"use_featured_image" => esc_html__( "Use as featured image for this Artwork", "gregstuart-custom-theme" ),
+		"archives" => esc_html__( "Artwork archives", "gregstuart-custom-theme" ),
+		"insert_into_item" => esc_html__( "Insert into Artwork", "gregstuart-custom-theme" ),
+		"uploaded_to_this_item" => esc_html__( "Upload to this Artwork", "gregstuart-custom-theme" ),
+		"filter_items_list" => esc_html__( "Filter Artworks list", "gregstuart-custom-theme" ),
+		"items_list_navigation" => esc_html__( "Artworks list navigation", "gregstuart-custom-theme" ),
+		"items_list" => esc_html__( "Artworks list", "gregstuart-custom-theme" ),
+		"attributes" => esc_html__( "Artworks attributes", "gregstuart-custom-theme" ),
+		"name_admin_bar" => esc_html__( "Artwork", "gregstuart-custom-theme" ),
+		"item_published" => esc_html__( "Artwork published", "gregstuart-custom-theme" ),
+		"item_published_privately" => esc_html__( "Artwork published privately.", "gregstuart-custom-theme" ),
+		"item_reverted_to_draft" => esc_html__( "Artwork reverted to draft.", "gregstuart-custom-theme" ),
+		"item_trashed" => esc_html__( "Artwork trashed.", "gregstuart-custom-theme" ),
+		"item_scheduled" => esc_html__( "Artwork scheduled", "gregstuart-custom-theme" ),
+		"item_updated" => esc_html__( "Artwork updated.", "gregstuart-custom-theme" ),
+		"parent_item_colon" => esc_html__( "Parent Artwork:", "gregstuart-custom-theme" ),
+	];
+
+	$args = [
+		"label" => esc_html__( "Artworks", "gregstuart-custom-theme" ),
+		"labels" => $labels,
+		"description" => "",
+		"public" => true,
+		"publicly_queryable" => true,
+		"show_ui" => true,
+		"show_in_rest" => true,
+		"rest_base" => "",
+		"rest_controller_class" => "WP_REST_Posts_Controller",
+		"rest_namespace" => "wp/v2",
+		"has_archive" => true,
+		"show_in_menu" => true,
+		"show_in_nav_menus" => true,
+		"delete_with_user" => false,
+		"exclude_from_search" => false,
+		"capability_type" => "post",
+		"map_meta_cap" => true,
+		"hierarchical" => false,
+		"can_export" => false,
+		"rewrite" => [ "slug" => "artwork", "with_front" => true ],
+		"query_var" => true,
+		"supports" => [ "title", "editor", "thumbnail", "revisions" ],
+		"show_in_graphql" => false,
+	];
+
+	register_post_type( "artwork", $args );
+}
+
+add_action( 'init', 'cptui_register_my_cpts_artwork' );
+
+
+function cptui_register_my_taxes() {
+
+	/**
+	 * Taxonomy: Artwork Types.
+	 */
+
+	$labels = [
+		"name" => esc_html__( "Artwork Types", "gregstuart-custom-theme" ),
+		"singular_name" => esc_html__( "Artwork Type", "gregstuart-custom-theme" ),
+		"menu_name" => esc_html__( "Artwork Types", "gregstuart-custom-theme" ),
+		"all_items" => esc_html__( "All Artwork Types", "gregstuart-custom-theme" ),
+		"edit_item" => esc_html__( "Edit Artwork Type", "gregstuart-custom-theme" ),
+		"view_item" => esc_html__( "View Artwork Type", "gregstuart-custom-theme" ),
+		"update_item" => esc_html__( "Update Artwork Type name", "gregstuart-custom-theme" ),
+		"add_new_item" => esc_html__( "Add new Artwork Type", "gregstuart-custom-theme" ),
+		"new_item_name" => esc_html__( "New Artwork Type name", "gregstuart-custom-theme" ),
+		"parent_item" => esc_html__( "Parent Artwork Type", "gregstuart-custom-theme" ),
+		"parent_item_colon" => esc_html__( "Parent Artwork Type:", "gregstuart-custom-theme" ),
+		"search_items" => esc_html__( "Search Artwork Types", "gregstuart-custom-theme" ),
+		"popular_items" => esc_html__( "Popular Artwork Types", "gregstuart-custom-theme" ),
+		"separate_items_with_commas" => esc_html__( "Separate Artwork Types with commas", "gregstuart-custom-theme" ),
+		"add_or_remove_items" => esc_html__( "Add or remove Artwork Types", "gregstuart-custom-theme" ),
+		"choose_from_most_used" => esc_html__( "Choose from the most used Artwork Types", "gregstuart-custom-theme" ),
+		"not_found" => esc_html__( "No Artwork Types found", "gregstuart-custom-theme" ),
+		"no_terms" => esc_html__( "No Artwork Types", "gregstuart-custom-theme" ),
+		"items_list_navigation" => esc_html__( "Artwork Types list navigation", "gregstuart-custom-theme" ),
+		"items_list" => esc_html__( "Artwork Types list", "gregstuart-custom-theme" ),
+		"back_to_items" => esc_html__( "Back to Artwork Types", "gregstuart-custom-theme" ),
+		"name_field_description" => esc_html__( "The name is how it appears on your site.", "gregstuart-custom-theme" ),
+		"parent_field_description" => esc_html__( "Assign a parent term to create a hierarchy. The term Jazz, for example, would be the parent of Bebop and Big Band.", "gregstuart-custom-theme" ),
+		"slug_field_description" => esc_html__( "The slug is the URL-friendly version of the name. It is usually all lowercase and contains only letters, numbers, and hyphens.", "gregstuart-custom-theme" ),
+		"desc_field_description" => esc_html__( "The description is not prominent by default; however, some themes may show it.", "gregstuart-custom-theme" ),
+	];
+
+	
+	$args = [
+		"label" => esc_html__( "Artwork Types", "gregstuart-custom-theme" ),
+		"labels" => $labels,
+		"public" => true,
+		"publicly_queryable" => true,
+		"hierarchical" => true,
+		"show_ui" => true,
+		"show_in_menu" => true,
+		"show_in_nav_menus" => true,
+		"query_var" => true,
+		"rewrite" => [ 'slug' => 'artwork_type', 'with_front' => true, ],
+		"show_admin_column" => false,
+		"show_in_rest" => true,
+		"show_tagcloud" => false,
+		"rest_base" => "artwork_type",
+		"rest_controller_class" => "WP_REST_Terms_Controller",
+		"rest_namespace" => "wp/v2",
+		"show_in_quick_edit" => false,
+		"sort" => false,
+		"show_in_graphql" => false,
+	];
+	register_taxonomy( "artwork_type", [ "artwork" ], $args );
+}
+add_action( 'init', 'cptui_register_my_taxes' );
+
+
 ?>
