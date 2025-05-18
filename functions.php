@@ -9,7 +9,7 @@
 
 if ( ! defined( 'GREGSTUART_VERSION' ) ) {
 	// Replace with the current version of your theme
-	define( 'GREGSTUART_VERSION', '1.0.0' );
+	define( 'GREGSTUART_VERSION', '1.0.0' ); // Or update if you change versions
 }
 
 if ( ! function_exists( 'gregstuart_setup' ) ) :
@@ -18,53 +18,34 @@ if ( ! function_exists( 'gregstuart_setup' ) ) :
 	 */
 	function gregstuart_setup() {
 		// Make theme available for translation.
-		// Translations can be filed in the /languages/ directory.
 		load_theme_textdomain( 'gregstuart-custom-theme', get_template_directory() . '/languages' );
 
 		// Add default posts and comments RSS feed links to head.
 		add_theme_support( 'automatic-feed-links' );
 
 		// Let WordPress manage the document title.
-		// By adding theme support, we declare that this theme does not use a
-		// hard-coded <title> tag in the document head, and expect WordPress to
-		// provide it for us.
 		add_theme_support( 'title-tag' );
 
 		// Enable support for Post Thumbnails on posts and pages.
 		add_theme_support( 'post-thumbnails' );
 
-		// Set up the WordPress core custom background feature.
-        // add_theme_support( 'custom-background', apply_filters( 'gregstuart_custom_background_args', array(
-        //  'default-color' => 'ffffff',
-        //  'default-image' => '',
-        // ) ) );
-
 		// Add theme support for selective refresh for widgets.
 		add_theme_support( 'customize-selective-refresh-widgets' );
 
-		/**
-		 * Add support for core custom logo.
-		 *
-		 * @link https://codex.wordpress.org/Theme_Logo
-		 */
+		// Add support for core custom logo.
 		add_theme_support( 'custom-logo', array(
-			'height'      => 100, // Adjust as needed, max height
-			'width'       => 400, // Adjust as needed, max width
+			'height'      => 100,
+			'width'       => 400,
 			'flex-height' => true,
 			'flex-width'  => true,
-			// 'header-text' => array( 'site-title', 'site-description' ), // Un-comment to allow site title/description if no logo
 		) );
 
 		// This theme uses wp_nav_menu() in one location.
 		register_nav_menus( array(
 			'primary_menu' => esc_html__( 'Primary Menu', 'gregstuart-custom-theme' ),
-			// You can register other menus here if needed, e.g. 'footer_menu'
 		) );
 
-		/*
-		 * Switch default core markup for search form, comment form, and comments
-		 * to output valid HTML5.
-		 */
+		// Switch default core markup for search form, comment form, and comments to output valid HTML5.
 		add_theme_support( 'html5', array(
 			'search-form',
 			'comment-form',
@@ -85,14 +66,23 @@ function gregstuart_scripts_styles() {
 	// Enqueue Google Fonts: Bowlby One SC
 	wp_enqueue_style( 'gregstuart-google-fonts', 'https://fonts.googleapis.com/css2?family=Bowlby+One+SC&display=swap', array(), null );
 
-	// Enqueue parent theme stylesheet.
-    // If you were building a child theme, you would enqueue the parent theme's style first.
-    // Example: wp_enqueue_style( 'parent-style', get_template_directory_uri() . '/style.css' );
-
 	// Enqueue main stylesheet.
 	wp_enqueue_style( 'gregstuart-main-style', get_stylesheet_uri(), array(), GREGSTUART_VERSION );
 
-	// Example of enqueuing a JS file (if you need one later)
+	// --- GLightbox Integration START ---
+	// Enqueue GLightbox CSS (adjust version number if you download a different one)
+	// Make sure '3.3.1' matches the version of glightbox.min.css you have.
+	wp_enqueue_style( 'glightbox-css', get_template_directory_uri() . '/assets/css/glightbox.min.css', array(), '3.3.1' );
+
+	// Enqueue GLightbox JS (true for footer)
+	// Make sure '3.3.1' matches the version of glightbox.min.js you have.
+	wp_enqueue_script( 'glightbox-js', get_template_directory_uri() . '/assets/js/glightbox.min.js', array(), '3.3.1', true );
+
+	// Enqueue your custom lightbox initializer script (depends on glightbox-js)
+	wp_enqueue_script( 'gregstuart-lightbox-init', get_template_directory_uri() . '/assets/js/lightbox-init.js', array('glightbox-js'), GREGSTUART_VERSION, true );
+	// --- GLightbox Integration END ---
+
+    // Example of enqueuing another JS file (if you need one later)
 	// wp_enqueue_script( 'gregstuart-custom-js', get_template_directory_uri() . '/js/custom.js', array('jquery'), GREGSTUART_VERSION, true );
 
     // Example for adding threaded comments script
@@ -102,10 +92,6 @@ function gregstuart_scripts_styles() {
 }
 add_action( 'wp_enqueue_scripts', 'gregstuart_scripts_styles' );
 
-?>
-
-<?php
-// Add this to the end of your functions.php file
 
 /**
  * Custom Nav Walker to add 'nav-link' class to <a> tags
@@ -129,11 +115,8 @@ class GregStuart_Nav_Walker extends Walker_Nav_Menu {
         $classes = empty( $item->classes ) ? array() : (array) $item->classes;
         $classes[] = 'menu-item-' . $item->ID;
 
-        // Add 'nav-link' class to the <a> tag
         $item_classes = 'nav-link';
 
-        // Check if the item is the current page or an ancestor of the current page.
-        // This helps in identifying active links for various scenarios (pages, posts, archives).
         $is_current = false;
         if ( in_array( 'current-menu-item', $classes ) ||
              in_array( 'current-menu-ancestor', $classes ) ||
@@ -143,7 +126,7 @@ class GregStuart_Nav_Walker extends Walker_Nav_Menu {
         }
 
         if ( $is_current ) {
-            $item_classes .= ' nav-link-active'; // Your active class
+            $item_classes .= ' nav-link-active';
         }
 
         $atts = array();
@@ -155,7 +138,7 @@ class GregStuart_Nav_Walker extends Walker_Nav_Menu {
             $atts['rel'] = $item->xfn;
         }
         $atts['href']   = ! empty( $item->url ) ? $item->url : '';
-        $atts['class']  = $item_classes; // Apply our custom classes to the <a> tag
+        $atts['class']  = $item_classes;
 
         $atts = apply_filters( 'nav_menu_link_attributes', $atts, $item, $args, $depth );
 
@@ -179,18 +162,9 @@ class GregStuart_Nav_Walker extends Walker_Nav_Menu {
         $output .= $indent . apply_filters( 'walker_nav_menu_start_el', $item_output, $item, $depth, $args );
     }
 
-    /**
-     * Ends the element output, if needed.
-     *
-     * @see Walker::end_el()
-     *
-     * @param string   $output Used to append additional content (passed by reference).
-     * @param WP_Post  $item   Page data object. Not used.
-     * @param int      $depth  Depth of page. Not Used.
-     * @param stdClass $args   An object of wp_nav_menu() arguments.
-     */
+    // You might not need the end_el function unless you are doing something very custom with the <li> closing.
     // function end_el( &$output, $item, $depth = 0, $args = null ) {
-    //  $output .= "</li>\n"; // WordPress usually adds <li> in the main function
+    //  $output .= "</li>\n";
     // }
 }
 ?>

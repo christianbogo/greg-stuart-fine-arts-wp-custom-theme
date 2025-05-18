@@ -9,13 +9,32 @@
  * @package Greg_Stuart_Custom_Theme
  */
 ?>
-    </main><footer id="colophon" class="site-footer">
-        <?php // Your ContactFooter equivalent will go here eventually ?>
-        <div class="site-info" style="text-align:center; padding: 20px; background-color: #f0f0f0;">
-            &copy; <?php echo date_i18n( 'Y' ); ?> <?php bloginfo( 'name' ); ?>.
-            <?php /* <a href="<?php echo esc_url( __( 'https://wordpress.org/', 'gregstuart-custom-theme' ) ); ?>">
-                <?php printf( esc_html__( 'Proudly powered by %s', 'gregstuart-custom-theme' ), 'WordPress' ); ?>
-            </a> */ ?>
-        </div></footer><?php wp_footer(); ?>
-</body>
+		</main><footer id="colophon" class="site-footer contact-footer"> <?php // Added 'contact-footer' class ?>
+			<div class="contact-footer-info">
+				<p class="contact-footer-name">Greg Stuart</p>
+				<p class="contact-footer-email">
+					<a href="mailto:greg@stuarturbandesign.com">greg@stuarturbandesign.com</a>
+				</p>
+				<?php
+				// Get the URL of the 'About' page.
+				// This assumes you have a page with the slug 'about'.
+				// If your 'About' page has a different slug, change 'about' accordingly.
+				$about_page = get_page_by_path( 'about' );
+				if ( $about_page ) :
+				?>
+				<p class="contact-footer-about">
+					<a href="<?php echo esc_url( get_permalink( $about_page->ID ) ); ?>">Learn more about Greg Stuart</a>
+				</p>
+				<?php endif; ?>
+			</div>
+			<div class="contact-footer-credit">
+				<p>
+					Site Managed by
+					<a href="https://gravatar.com/christianbcutter" target="_blank" rel="noopener noreferrer">
+						Christian Cutter
+					</a>
+				</p>
+			</div>
+		</footer><?php wp_footer(); ?>
+	</body>
 </html>
