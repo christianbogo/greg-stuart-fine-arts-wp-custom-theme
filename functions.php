@@ -8,8 +8,7 @@
  */
 
 if ( ! defined( 'GREGSTUART_VERSION' ) ) {
-	// Replace with the current version of your theme
-	define( 'GREGSTUART_VERSION', '1.0.0' ); // Or update if you change versions
+	define( 'GREGSTUART_VERSION', '1.0.0' );
 }
 
 if ( ! function_exists( 'gregstuart_setup' ) ) :
@@ -17,35 +16,20 @@ if ( ! function_exists( 'gregstuart_setup' ) ) :
 	 * Sets up theme defaults and registers support for various WordPress features.
 	 */
 	function gregstuart_setup() {
-		// Make theme available for translation.
 		load_theme_textdomain( 'gregstuart-custom-theme', get_template_directory() . '/languages' );
-
-		// Add default posts and comments RSS feed links to head.
 		add_theme_support( 'automatic-feed-links' );
-
-		// Let WordPress manage the document title.
 		add_theme_support( 'title-tag' );
-
-		// Enable support for Post Thumbnails on posts and pages.
 		add_theme_support( 'post-thumbnails' );
-
-		// Add theme support for selective refresh for widgets.
 		add_theme_support( 'customize-selective-refresh-widgets' );
-
-		// Add support for core custom logo.
 		add_theme_support( 'custom-logo', array(
 			'height'      => 100,
 			'width'       => 400,
 			'flex-height' => true,
 			'flex-width'  => true,
 		) );
-
-		// This theme uses wp_nav_menu() in one location.
 		register_nav_menus( array(
 			'primary_menu' => esc_html__( 'Primary Menu', 'gregstuart-custom-theme' ),
 		) );
-
-		// Switch default core markup for search form, comment form, and comments to output valid HTML5.
 		add_theme_support( 'html5', array(
 			'search-form',
 			'comment-form',
@@ -63,35 +47,16 @@ add_action( 'after_setup_theme', 'gregstuart_setup' );
  * Enqueue scripts and styles.
  */
 function gregstuart_scripts_styles() {
-	// Enqueue Google Fonts: Bowlby One SC
 	wp_enqueue_style( 'gregstuart-google-fonts', 'https://fonts.googleapis.com/css2?family=Bowlby+One+SC&display=swap', array(), null );
-
-	// Enqueue main stylesheet.
+    wp_enqueue_style( 'font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css', array(), '6.5.1' );
 	wp_enqueue_style( 'gregstuart-main-style', get_stylesheet_uri(), array(), GREGSTUART_VERSION );
 
-	// --- GLightbox Integration START ---
-	// Enqueue GLightbox CSS (adjust version number if you download a different one)
-	// Make sure '3.3.1' matches the version of glightbox.min.css you have.
+	// GLightbox Integration
 	wp_enqueue_style( 'glightbox-css', get_template_directory_uri() . '/assets/css/glightbox.min.css', array(), '3.3.1' );
-
-	// Enqueue GLightbox JS (true for footer)
-	// Make sure '3.3.1' matches the version of glightbox.min.js you have.
 	wp_enqueue_script( 'glightbox-js', get_template_directory_uri() . '/assets/js/glightbox.min.js', array(), '3.3.1', true );
-
-	// Enqueue your custom lightbox initializer script (depends on glightbox-js)
 	wp_enqueue_script( 'gregstuart-lightbox-init', get_template_directory_uri() . '/assets/js/lightbox-init.js', array('glightbox-js'), GREGSTUART_VERSION, true );
-	// --- GLightbox Integration END ---
-
-    // Example of enqueuing another JS file (if you need one later)
-	// wp_enqueue_script( 'gregstuart-custom-js', get_template_directory_uri() . '/js/custom.js', array('jquery'), GREGSTUART_VERSION, true );
-
-    // Example for adding threaded comments script
-    // if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
-    //  wp_enqueue_script( 'comment-reply' );
-    // }
 }
 add_action( 'wp_enqueue_scripts', 'gregstuart_scripts_styles' );
-
 
 /**
  * Custom Nav Walker to add 'nav-link' class to <a> tags
@@ -162,7 +127,8 @@ class GregStuart_Nav_Walker extends Walker_Nav_Menu {
         $output .= $indent . apply_filters( 'walker_nav_menu_start_el', $item_output, $item, $depth, $args );
     }
 
-    // You might not need the end_el function unless you are doing something very custom with the <li> closing.
+    // The end_el function is often not needed unless specific <li> closing markup is required.
+    // If you had custom logic in end_el, it would be preserved or commented if unused.
     // function end_el( &$output, $item, $depth = 0, $args = null ) {
     //  $output .= "</li>\n";
     // }

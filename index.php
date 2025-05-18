@@ -12,7 +12,7 @@
  * @package Greg_Stuart_Custom_Theme
  */
 
-get_header(); // This will include your header.php file
+get_header();
 ?>
 
 	<div id="primary" class="content-area">
@@ -24,15 +24,7 @@ get_header(); // This will include your header.php file
 				/* Start the Loop */
 				while ( have_posts() ) :
 					the_post();
-
-					/*
-					 * Include the Post-Format-specific template for the content.
-					 * If you want to override this in a child theme, then include a file
-					 * called content-___.php (where ___ is the Post Format) and that will be used instead.
-					 */
-					// get_template_part( 'template-parts/content', get_post_format() );
-                    // For now, let's just output the title and content directly for testing
-                    ?>
+					?>
                     <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
                         <header class="entry-header">
                             <?php the_title( '<h1 class="entry-title">', '</h1>' ); ?>
@@ -57,21 +49,18 @@ get_header(); // This will include your header.php file
                             ) );
                             ?>
                         </div><footer class="entry-footer">
-                           <?php // You can add post meta here later ?>
+                           <?php // Space for post meta if needed in the future ?>
                         </footer></article><?php
-
 				endwhile;
 
-				// the_posts_navigation(); // You can add navigation later
+				// Post navigation (e.g., the_posts_navigation();) can be added here if desired.
 
 			else :
-
-				// get_template_part( 'template-parts/content', 'none' ); // For when no content is found
+                // If no content is found, display a message.
+                // Consider creating a template-parts/content-none.php for a more structured approach.
                 echo "<p>No content found.</p>";
-
 			endif;
 			?>
 
 		</main></div><?php
-// get_sidebar(); // If you have a sidebar
-get_footer(); // This will include your footer.php file
+get_footer();
