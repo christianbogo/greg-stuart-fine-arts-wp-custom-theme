@@ -21,14 +21,11 @@ get_header();
 
 		if ($hero_image_url) {
 			// Attempt to get alt text from the image attachment details.
-			// This works best if get_field('hero_cover_photo') returns an image ID or array.
-			// If it only returns a URL, attachment_url_to_postid() is a good attempt.
 			$hero_image_id = attachment_url_to_postid($hero_image_url);
 			if ($hero_image_id) {
 				$hero_image_alt = get_post_meta($hero_image_id, '_wp_attachment_image_alt', true);
 			}
 		}
-		// Fallback alt text if not found or if ACF field is empty.
 		if (empty($hero_image_alt)) {
 			$hero_image_alt = "Hero graphic for Greg Stuart Fine Arts";
 		}
@@ -36,9 +33,9 @@ get_header();
 		<section class="hero">
 			<div class="image-container">
 				<?php if ( $hero_image_url ) : ?>
-					<a href="<?php echo esc_url( $hero_image_url ); ?>" 
-					   class="glightbox" 
-					   data-gallery="hero-cover" 
+					<a href="<?php echo esc_url( $hero_image_url ); ?>"
+					   class="glightbox"
+					   data-gallery="hero-cover"
 					   data-title="<?php echo esc_attr( $hero_image_alt ); ?>">
 						<img src="<?php echo esc_url( $hero_image_url ); ?>" alt="<?php echo esc_attr( $hero_image_alt ); ?>" class="hero-image" />
 					</a>
@@ -55,10 +52,9 @@ get_header();
 		// --- Artwork Grid Section ---
 		$artwork_grid_images = [];
 		for ( $i = 1; $i <= 5; $i++ ) {
-			// Assumes ACF field 'artwork_grid_image_X' returns an Image URL.
 			$image_url = get_field( 'artwork_grid_image_' . $i );
-			$image_alt = 'Artwork Grid Image ' . $i; // Basic fallback alt
-			$image_title = 'Artwork ' . $i; // Basic fallback title for lightbox
+			$image_alt = 'Artwork Grid Image ' . $i; 
+			$image_title = 'Artwork ' . $i; 
 
 			if ($image_url) {
 				$image_id = attachment_url_to_postid($image_url);
@@ -66,12 +62,12 @@ get_header();
 					$alt_text = get_post_meta($image_id, '_wp_attachment_image_alt', true);
 					if (!empty($alt_text)) {
 						$image_alt = $alt_text;
-						$image_title = $alt_text; // Use alt for title if available
+						$image_title = $alt_text; 
 					} else {
-						$attachment_title = get_the_title($image_id);
-						if (!empty($attachment_title)) {
-							$image_alt = $attachment_title; // Fallback to attachment title for alt
-							$image_title = $attachment_title; // Use attachment title for lightbox title
+						$attachment_title_text = get_the_title($image_id);
+						if (!empty($attachment_title_text)) {
+							$image_alt = $attachment_title_text; 
+							$image_title = $attachment_title_text; 
 						}
 					}
 				}
@@ -82,15 +78,15 @@ get_header();
 				'title' => $image_title,
 			];
 		}
-		$gallery_page_url = get_permalink( get_page_by_path( 'gallery' ) ); // Assumes gallery page slug is 'gallery'
+		$gallery_page_url = get_permalink( get_page_by_path( 'gallery' ) );
 		?>
 		<section class="artwork-grid-section">
 			<div class="artwork-grid">
 				<?php foreach ( $artwork_grid_images as $index => $image_data ) : ?>
 					<div class="artwork-item">
 						<?php if ( ! empty( $image_data['url'] ) ) : ?>
-							<a href="<?php echo esc_url( $image_data['url'] ); ?>" 
-							   class="glightbox" 
+							<a href="<?php echo esc_url( $image_data['url'] ); ?>"
+							   class="glightbox"
 							   data-gallery="homepage-artwork-grid"
 							   data-title="<?php echo esc_attr( $image_data['title'] ); ?>">
 								<img src="<?php echo esc_url( $image_data['url'] ); ?>" alt="<?php echo esc_attr( $image_data['alt'] ); ?>" />
@@ -104,7 +100,7 @@ get_header();
 				<?php endforeach; ?>
 			</div>
 			<?php if ( $gallery_page_url ) : ?>
-			<div class="sketch-highlight-button-container"> <?php // Reusing class for button container styling ?>
+			<div class="sketch-highlight-button-container">
 				<a href="<?php echo esc_url( $gallery_page_url ); ?>" class="sketch-highlight-button">
 					<?php esc_html_e( 'View More Art', 'gregstuart-custom-theme' ); ?>
 					<i class="fas fa-arrow-right sketch-highlight-button-icon"></i>
@@ -117,7 +113,7 @@ get_header();
 		// --- Sketch Highlight Section ---
 		$sketch_args = array(
 			'post_type'      => 'artwork',
-			'posts_per_page' => 3,
+			'posts_per_page' => 3, // Show 3 most recently ordered sketches
 			'tax_query'      => array(
 				array(
 					'taxonomy' => 'artwork_type',
@@ -125,38 +121,48 @@ get_header();
 					'terms'    => 'sketch',
 				),
 			),
-			'orderby'        => 'date',
-			'order'          => 'DESC',
+			'orderby'        => 'menu_order', // Use custom order
+			'order'          => 'ASC',        // Typically ASC for menu_order
 		);
 		$sketch_query = new WP_Query( $sketch_args );
-		$sketches_page_url = get_permalink( get_page_by_path( 'sketches' ) ); // Assumes sketches page slug is 'sketches'
+		$sketches_page_url = get_permalink( get_page_by_path( 'sketches' ) ); 
 
 		if ( $sketch_query->have_posts() ) :
 		?>
 		<section class="sketch-highlight">
-			<h2 class="sketch-highlight-title"><?php esc_html_e( 'Recent Sketches', 'gregstuart-custom-theme' ); // Changed title slightly for variety ?></h2>
+			<h2 class="sketch-highlight-title"><?php esc_html_e( 'Recent Sketches', 'gregstuart-custom-theme' ); ?></h2>
 			<div class="sketch-highlight-grid">
 				<?php
 				while ( $sketch_query->have_posts() ) : $sketch_query->the_post();
 					$full_image_url_array = wp_get_attachment_image_src( get_post_thumbnail_id(), 'full' );
 					$full_image_url = $full_image_url_array ? $full_image_url_array[0] : '';
 					$artwork_title = get_the_title();
-					$artwork_description = get_field('artwork_description'); // ACF field for description
+					
+					$artwork_description = ''; 
+					if ( has_post_thumbnail() ) {
+						$thumbnail_id = get_post_thumbnail_id( get_the_ID() );
+						if ( $thumbnail_id ) {
+							$attachment_post = get_post( $thumbnail_id );
+							if ( $attachment_post && ! empty( $attachment_post->post_content ) ) {
+								$artwork_description = $attachment_post->post_content;
+							}
+						}
+					}
 				?>
 				<div class="sketch-highlight-item">
 					<?php if ( has_post_thumbnail() && $full_image_url ) : ?>
 						<div class="sketch-highlight-image-container">
-							<a href="<?php echo esc_url( $full_image_url ); ?>" 
-							   class="glightbox" 
+							<a href="<?php echo esc_url( $full_image_url ); ?>"
+							   class="glightbox"
 							   data-gallery="homepage-sketches"
 							   data-title="<?php echo esc_attr( $artwork_title ); ?>"
-							   data-description="<?php echo esc_attr( wp_strip_all_tags( $artwork_description ) ); // Use custom description if available ?>">
+							   data-description="<?php echo esc_attr( wp_strip_all_tags( $artwork_description ) ); ?>">
 								<?php the_post_thumbnail('medium_large', ['class' => 'sketch-highlight-image', 'alt' => esc_attr($artwork_title)]); ?>
 							</a>
 						</div>
 					<?php endif; ?>
 					<h3 class="sketch-highlight-item-title"><?php echo esc_html( $artwork_title ); ?></h3>
-					<?php if ( $artwork_description ) : ?>
+					<?php if ( ! empty( $artwork_description ) ) : ?>
 						<p class="sketch-highlight-item-description"><?php echo nl2br( esc_html( wp_strip_all_tags( $artwork_description ) ) ); ?></p>
 					<?php endif; ?>
 				</div>
@@ -171,7 +177,10 @@ get_header();
 			</div>
 			<?php endif; ?>
 		</section>
-		<?php endif; // End sketch_query->have_posts() ?>
+		<?php endif; ?>
 
-	</main></div><?php
+	</main>
+</div>
+<?php
 get_footer();
+?>

@@ -48,11 +48,11 @@ add_action( 'after_setup_theme', 'gregstuart_setup' );
  */
 function gregstuart_scripts_styles() {
 	// Enqueue Google Fonts: Anton (for site title), Fira Sans Condensed (for artwork titles/captions), Inter Tight (for body text)
-	wp_enqueue_style( 
-		'gregstuart-google-fonts', 
-		'https://fonts.googleapis.com/css2?family=Anton&family=Fira+Sans+Condensed:wght@400&family=Inter+Tight:wght@400&display=swap', 
-		array(), 
-		null 
+	wp_enqueue_style(
+		'gregstuart-google-fonts',
+		'https://fonts.googleapis.com/css2?family=Anton&family=Fira+Sans+Condensed:wght@400&family=Inter+Tight:wght@400&display=swap',
+		array(),
+		null
 	);
 
     wp_enqueue_style( 'font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css', array(), '6.5.1' );
@@ -135,6 +135,12 @@ class GregStuart_Nav_Walker extends Walker_Nav_Menu {
     }
 }
 
+// --- CPT UI Post Type and Taxonomy Registration Code (from your existing functions.php) ---
+// It's assumed this block of code is already present in your functions.php
+// If not, ensure it is. For brevity, I'm not repeating the full CPT UI export here.
+// Make sure the `cptui_register_my_cpts_artwork()` and `cptui_register_my_taxes()` functions
+// are called as they were before.
+
 function cptui_register_my_cpts_artwork() {
 
 	/**
@@ -177,6 +183,9 @@ function cptui_register_my_cpts_artwork() {
 		"parent_item_colon" => esc_html__( "Parent Artwork:", "gregstuart-custom-theme" ),
 	];
 
+    // IMPORTANT: Ensure you have made the change to 'supports' within the CPT UI plugin interface
+    // to remove 'editor'. The array below reflects that change. If you haven't done it in CPT UI,
+    // this code might be overwritten if you re-save the CPT via the plugin.
 	$args = [
 		"label" => esc_html__( "Artworks", "gregstuart-custom-theme" ),
 		"labels" => $labels,
@@ -199,13 +208,14 @@ function cptui_register_my_cpts_artwork() {
 		"can_export" => false,
 		"rewrite" => [ "slug" => "artwork", "with_front" => true ],
 		"query_var" => true,
-		"supports" => [ "title", "editor", "thumbnail", "revisions" ],
+		// Ensure 'editor' is removed here if you are not managing 'supports' via CPT UI plugin.
+        // Best practice is to manage 'supports' via the CPT UI plugin settings.
+		"supports" => [ "title", "thumbnail", "revisions" ], // 'editor' removed
 		"show_in_graphql" => false,
 	];
 
 	register_post_type( "artwork", $args );
 }
-
 add_action( 'init', 'cptui_register_my_cpts_artwork' );
 
 
@@ -243,7 +253,7 @@ function cptui_register_my_taxes() {
 		"desc_field_description" => esc_html__( "The description is not prominent by default; however, some themes may show it.", "gregstuart-custom-theme" ),
 	];
 
-	
+
 	$args = [
 		"label" => esc_html__( "Artwork Types", "gregstuart-custom-theme" ),
 		"labels" => $labels,
@@ -269,5 +279,72 @@ function cptui_register_my_taxes() {
 }
 add_action( 'init', 'cptui_register_my_taxes' );
 
+// ---- NEW FUNCTION TO AUTO-POPULATE ARTWORK TITLE ----
+/**
+ * Auto-populate the Artwork CPT title from its featured image title.
+ *
+ * @param int     $post_id The ID of the post being saved.
+ * @param WP_Post $post    The post object.
+ * @param bool    $update  Whether this is an existing post being updated or not.
+ */
+function gregstuart_set_artwork_title_from_featured_image( $post_id, $post, $update ) {
+    // Only run for the 'artwork' post type.
+    if ( 'artwork' !== $post->post_type ) {
+        return;
+    }
+
+    // Check if it's an autosave, a revision, or if the user doesn't have permissions.
+    if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) || wp_is_post_revision( $post_id ) || ! current_user_can( 'edit_post', $post_id ) ) {
+        return;
+    }
+
+    // Check if a featured image is set.
+    if ( has_post_thumbnail( $post_id ) ) {
+        $thumbnail_id = get_post_thumbnail_id( $post_id );
+        if ( $thumbnail_id ) {
+            $image_title = get_the_title( $thumbnail_id );
+
+            // If the image has a title and it's different from the post's current title,
+            // or if the post title is currently empty (e.g., for a new post).
+            if ( ! empty( $image_title ) && ( $post->post_title !== $image_title || empty( $post->post_title ) ) ) {
+                // Unhook this function to prevent infinite loops.
+                remove_action( 'save_post_artwork', 'gregstuart_set_artwork_title_from_featured_image', 10, 3 );
+
+                // Update the post title.
+                wp_update_post( array(
+                    'ID'         => $post_id,
+                    'post_title' => $image_title,
+                ) );
+
+                // Re-hook this function.
+                add_action( 'save_post_artwork', 'gregstuart_set_artwork_title_from_featured_image', 10, 3 );
+            }
+        }
+    }
+}
+// The '10' is the priority, '3' is the number of arguments the function accepts.
+add_action( 'save_post_artwork', 'gregstuart_set_artwork_title_from_featured_image', 10, 3 );
+
+// ---- NEW FUNCTION TO ENQUEUE ADMIN SCRIPT FOR ARTWORK CPT ----
+/**
+ * Enqueues admin scripts for the 'artwork' CPT edit screen.
+ *
+ * @param string $hook The current admin page hook.
+ */
+function gregstuart_enqueue_artwork_admin_scripts( $hook ) {
+    global $post;
+
+    // Only load on the 'artwork' post type edit screens (new or existing).
+    if ( ( 'post.php' === $hook || 'post-new.php' === $hook ) && isset( $post->post_type ) && 'artwork' === $post->post_type ) {
+        wp_enqueue_script(
+            'gregstuart-artwork-admin-js', // Handle for the script
+            get_template_directory_uri() . '/assets/js/artwork-admin.js', // Path to the JS file
+            array( 'jquery' ), // Dependencies (jQuery is a good default)
+            GREGSTUART_VERSION, // Version number
+            true // Load in footer
+        );
+    }
+}
+add_action( 'admin_enqueue_scripts', 'gregstuart_enqueue_artwork_admin_scripts' );
 
 ?>

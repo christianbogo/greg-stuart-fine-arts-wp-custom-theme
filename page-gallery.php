@@ -2,7 +2,8 @@
 /**
  * Template Name: Gallery Page
  *
- * This is the template that displays artworks categorized as "Gallery Piece".
+ * This is the template that displays artworks categorized as "Gallery Piece"
+ * using custom order.
  *
  * @link https://developer.wordpress.org/themes/basics/template-hierarchy/
  *
@@ -18,18 +19,12 @@ get_header();
 		<div class="page gallery">
 			<header class="gallery-header">
 				<h1 class="gallery-title">Greg's Paintings</h1>
-				<div class="gallery-intro"> <?php // Changed <p> to <div> to better accommodate block editor content ?>
+				<div class="gallery-intro">
     <?php
-    // Display content entered in the WP Admin editor for this page.
-    // This needs to be within The Loop.
     if ( have_posts() ) :
         while ( have_posts() ) : the_post();
             the_content();
         endwhile;
-        // No need to rewind or reset post data here if this is the only loop for page content.
-    else :
-        // Optionally, handle the case where no content is found for the page.
-        // echo '<p>No introductory content has been set for this page.</p>';
     endif;
     ?>
 </div>
@@ -38,17 +33,17 @@ get_header();
 			<?php
 			// WP_Query arguments to fetch "Gallery Piece" artworks.
 			$args = array(
-				'post_type'      => 'artwork',       // Custom post type slug.
-				'posts_per_page' => -1,              // Display all matching artworks.
+				'post_type'      => 'artwork',       
+				'posts_per_page' => -1,              
 				'tax_query'      => array(
 					array(
-						'taxonomy' => 'artwork_type',  // Custom taxonomy slug.
+						'taxonomy' => 'artwork_type',  
 						'field'    => 'slug',
-						'terms'    => 'gallery-piece', // Slug for "Gallery Piece" term.
+						'terms'    => 'gallery-piece', 
 					),
 				),
-				'orderby'        => 'date',          // Order by publication date.
-				'order'          => 'DESC',          // Show the latest artworks first.
+				'orderby'        => 'menu_order', // Use custom order
+				'order'          => 'ASC',        // Typically ASC for menu_order
 			);
 
 			$gallery_query = new WP_Query( $args );
@@ -58,15 +53,26 @@ get_header();
 					$full_image_url_array = wp_get_attachment_image_src( get_post_thumbnail_id(), 'full' );
 					$full_image_url = $full_image_url_array ? $full_image_url_array[0] : '';
 					$artwork_title = get_the_title();
+
+					$artwork_description = ''; 
+					if ( has_post_thumbnail() ) {
+						$thumbnail_id = get_post_thumbnail_id( get_the_ID() );
+						if ( $thumbnail_id ) {
+							$attachment_post = get_post( $thumbnail_id );
+							if ( $attachment_post && ! empty( $attachment_post->post_content ) ) {
+								$artwork_description = $attachment_post->post_content;
+							}
+						}
+					}
 					?>
 					<div class="gallery-item">
 						<?php if ( has_post_thumbnail() && $full_image_url ) : ?>
 							<a href="<?php echo esc_url( $full_image_url ); ?>"
 							   class="glightbox"
 							   data-gallery="greg-stuart-gallery"
-							   data-title="<?php echo esc_attr( $artwork_title ); // Title for GLightbox caption ?>">
+							   data-title="<?php echo esc_attr( $artwork_title ); ?>"
+							   data-description="<?php echo esc_attr( wp_strip_all_tags( $artwork_description ) ); ?>">
 								<?php
-								// Displaying 'large' thumbnail size for grid; 'full' is used for lightbox.
 								the_post_thumbnail('large', ['alt' => esc_attr( $artwork_title )]);
 								?>
 							</a>
@@ -74,19 +80,25 @@ get_header();
 							<div class="gallery-placeholder"><?php esc_html_e( 'Image unavailable', 'gregstuart-custom-theme' ); ?></div>
 						<?php endif; ?>
 						<div class="gallery-item-title"><?php echo esc_html( $artwork_title ); ?></div>
+						<?php
+						/*
+						if ( ! empty( $artwork_description ) ) : ?>
+							<p class="gallery-item-description"><?php echo nl2br( esc_html( wp_strip_all_tags( $artwork_description ) ) ); ?></p>
+						<?php endif;
+						*/
+						?>
 					</div>
 					<?php
 				endwhile;
-				wp_reset_postdata(); // Important: Reset post data after custom WP_Query loops.
-			elseif (current_user_can('edit_posts')) : // Show helpful message to users who can edit posts.
+				wp_reset_postdata(); 
+			elseif (current_user_can('edit_posts')) : 
                 ?>
                 <div class="gallery-empty">
                     <p><?php esc_html_e( 'No artworks found in the "Gallery Piece" category.', 'gregstuart-custom-theme' ); ?></p>
                     <p><?php
                         printf(
                             wp_kses(
-                                /* translators: 1: Link to Add New Artwork page. */
-                                __( 'Ready to add some? <a href="%1$s">Add a new artwork</a> and assign it to the "Gallery Piece" type.', 'gregstuart-custom-theme' ),
+                                __( 'Ready to add some? <a href="%1$s">Add a new artwork</a> and assign it to the "Gallery Piece" type. You can then re-order them using the "Re-order" link under Artworks.', 'gregstuart-custom-theme' ),
                                 array( 'a' => array( 'href' => array() ) )
                             ),
                             esc_url( admin_url( 'post-new.php?post_type=artwork' ) )
@@ -94,11 +106,15 @@ get_header();
                     ?></p>
                 </div>
                 <?php
-			else : // Default message for general visitors if no gallery pieces are found.
+			else : 
 				?>
 				<div class="gallery-empty"><?php esc_html_e( 'No artworks found in the gallery.', 'gregstuart-custom-theme' ); ?></div>
 				<?php
 			endif;
 			?>
-		</div></main></div><?php
+		</div>
+	</main>
+</div>
+<?php
 get_footer();
+?>
