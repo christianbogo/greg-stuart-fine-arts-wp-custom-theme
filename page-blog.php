@@ -18,9 +18,8 @@ get_header(); // Include header.php
 		<div class="blog-page-container page">
 			<header class="blog-header">
 				<?php
-				// Display the page title (e.g., "Blog") as set in the WordPress admin
-				// when this template is assigned to a page.
-				the_title( '<h1 class="blog-main-title">', '</h1>' );
+				// Display the page title using consistent styling with other pages
+				the_title( '<h1 class="blog-title">', '</h1>' );
 				?>
 				<?php
 				// Display content entered in the WP Admin editor for this page (if any).

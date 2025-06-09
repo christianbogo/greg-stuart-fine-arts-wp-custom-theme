@@ -50,7 +50,7 @@ function gregstuart_scripts_styles() {
 	// Enqueue Google Fonts: Anton (for site title), Fira Sans Condensed (for artwork titles/captions), Inter Tight (for body text)
 	wp_enqueue_style(
 		'gregstuart-google-fonts',
-		'https://fonts.googleapis.com/css2?family=Anton&family=Fira+Sans+Condensed:wght@400&family=Inter+Tight:wght@400&display=swap',
+		'https://fonts.googleapis.com/css2?family=Anton:wght@1000&family=Fira+Sans+Condensed:wght@400&family=Inter+Tight:wght@400&display=swap',
 		array(),
 		GREGSTUART_VERSION
 	);
@@ -64,6 +64,15 @@ function gregstuart_scripts_styles() {
 	wp_enqueue_script( 'gregstuart-lightbox-init', get_template_directory_uri() . '/assets/js/lightbox-init.js', array('glightbox-js'), GREGSTUART_VERSION, true );
 }
 add_action( 'wp_enqueue_scripts', 'gregstuart_scripts_styles' );
+
+/**
+ * Add preload links for critical Google Fonts
+ */
+function gregstuart_add_font_preload() {
+	echo '<link rel="preconnect" href="https://fonts.googleapis.com">' . "\n";
+	echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
+}
+add_action( 'wp_head', 'gregstuart_add_font_preload', 1 );
 
 /**
  * Custom Nav Walker to add 'nav-link' class to <a> tags
@@ -348,51 +357,51 @@ function gregstuart_enqueue_artwork_admin_scripts( $hook ) {
 add_action( 'admin_enqueue_scripts', 'gregstuart_enqueue_artwork_admin_scripts' );
 
 /**
- * Helper function to get image alt text and title with proper fallbacks
+ * Get image alt text and title from attachment
  *
- * @param string $image_url The image URL
- * @param string $fallback_alt Fallback alt text if none found
- * @param string $fallback_title Fallback title if none found
- * @return array Array with 'alt' and 'title' keys
+ * @param string $image_url The URL of the image
+ * @param string $fallback_alt Fallback alt text if none is found
+ * @param string $fallback_title Fallback title if none is found
+ * @return array Array containing 'alt' and 'title' keys
  */
-function gregstuart_get_image_alt_title( $image_url, $fallback_alt = '', $fallback_title = '' ) {
-	$image_alt = $fallback_alt;
-	$image_title = $fallback_title;
-	
-	if ( $image_url ) {
-		$image_id = attachment_url_to_postid( $image_url );
-		if ( $image_id ) {
-			// Try to get alt text first
-			$alt_text = get_post_meta( $image_id, '_wp_attachment_image_alt', true );
-			if ( ! empty( $alt_text ) ) {
-				$image_alt = $alt_text;
-				$image_title = $alt_text;
-			} else {
-				// Fallback to attachment title
-				$attachment_title_text = get_the_title( $image_id );
-				if ( ! empty( $attachment_title_text ) ) {
-					$image_alt = $attachment_title_text;
-					$image_title = $attachment_title_text;
-				}
-			}
-		}
-	}
-	
-	return array(
-		'alt'   => $image_alt,
-		'title' => $image_title,
-	);
+function gregstuart_get_image_alt_title($image_url, $fallback_alt = '', $fallback_title = '') {
+    $attachment_id = attachment_url_to_postid($image_url);
+    $alt = $fallback_alt;
+    $title = $fallback_title;
+
+    if ($attachment_id) {
+        $alt = get_post_meta($attachment_id, '_wp_attachment_image_alt', true);
+        if (empty($alt)) {
+            $alt = $fallback_alt;
+        }
+        
+        $attachment = get_post($attachment_id);
+        if ($attachment) {
+            $title = $attachment->post_title;
+            if (empty($title)) {
+                $title = $fallback_title;
+            }
+        }
+    }
+
+    return array(
+        'alt' => $alt,
+        'title' => $title
+    );
 }
 
 /**
- * Helper function to safely get page URL by slug
+ * Get page URL by slug
  *
- * @param string $page_slug The page slug to find
- * @return string|false The page URL or false if not found
+ * @param string $page_slug The slug of the page
+ * @return string|false The URL of the page or false if not found
  */
-function gregstuart_get_page_url_by_slug( $page_slug ) {
-	$page = get_page_by_path( $page_slug );
-	return $page ? get_permalink( $page ) : false;
+function gregstuart_get_page_url_by_slug($page_slug) {
+    $page = get_page_by_path($page_slug);
+    if ($page) {
+        return get_permalink($page->ID);
+    }
+    return false;
 }
 
 /**
@@ -470,5 +479,19 @@ add_action( 'customize_register', 'gregstuart_customize_register' );
  * 
  * Your theme is already configured to respect this custom ordering via 'menu_order' in queries.
  */
+
+/**
+ * Enforce HTTPS for certain resources
+ */
+function gregstuart_enforce_https($url) {
+    if (is_ssl()) {
+        $url = str_replace('http://', 'https://', $url);
+    }
+    return $url;
+}
+add_filter('style_loader_src', 'gregstuart_enforce_https');
+add_filter('script_loader_src', 'gregstuart_enforce_https');
+add_filter('wp_get_attachment_url', 'gregstuart_enforce_https');
+add_filter('wp_calculate_image_srcset', 'gregstuart_enforce_https');
 
 ?>
