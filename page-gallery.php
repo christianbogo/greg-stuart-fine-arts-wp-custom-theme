@@ -42,7 +42,7 @@ get_header();
 						'terms'    => 'gallery-piece', 
 					),
 				),
-				'orderby'        => 'menu_order', // Use custom order
+				'orderby'        => 'menu_order date', // Added fallback ordering
 				'order'          => 'ASC',        // Typically ASC for menu_order
 			);
 

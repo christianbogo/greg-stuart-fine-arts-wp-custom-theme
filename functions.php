@@ -52,7 +52,7 @@ function gregstuart_scripts_styles() {
 		'gregstuart-google-fonts',
 		'https://fonts.googleapis.com/css2?family=Anton&family=Fira+Sans+Condensed:wght@400&family=Inter+Tight:wght@400&display=swap',
 		array(),
-		null
+		GREGSTUART_VERSION
 	);
 
     wp_enqueue_style( 'font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css', array(), '6.5.1' );
@@ -208,9 +208,9 @@ function cptui_register_my_cpts_artwork() {
 		"can_export" => false,
 		"rewrite" => [ "slug" => "artwork", "with_front" => true ],
 		"query_var" => true,
-		// Ensure 'editor' is removed here if you are not managing 'supports' via CPT UI plugin.
-        // Best practice is to manage 'supports' via the CPT UI plugin settings.
-		"supports" => [ "title", "thumbnail", "revisions" ], // 'editor' removed
+		// IMPORTANT: 'editor' is intentionally removed to simplify the admin interface
+        // The main content editor is not needed since artwork descriptions come from the Media Library
+		"supports" => [ "title", "thumbnail", "revisions" ], // 'editor' removed for simplified workflow
 		"show_in_graphql" => false,
 	];
 
@@ -346,5 +346,129 @@ function gregstuart_enqueue_artwork_admin_scripts( $hook ) {
     }
 }
 add_action( 'admin_enqueue_scripts', 'gregstuart_enqueue_artwork_admin_scripts' );
+
+/**
+ * Helper function to get image alt text and title with proper fallbacks
+ *
+ * @param string $image_url The image URL
+ * @param string $fallback_alt Fallback alt text if none found
+ * @param string $fallback_title Fallback title if none found
+ * @return array Array with 'alt' and 'title' keys
+ */
+function gregstuart_get_image_alt_title( $image_url, $fallback_alt = '', $fallback_title = '' ) {
+	$image_alt = $fallback_alt;
+	$image_title = $fallback_title;
+	
+	if ( $image_url ) {
+		$image_id = attachment_url_to_postid( $image_url );
+		if ( $image_id ) {
+			// Try to get alt text first
+			$alt_text = get_post_meta( $image_id, '_wp_attachment_image_alt', true );
+			if ( ! empty( $alt_text ) ) {
+				$image_alt = $alt_text;
+				$image_title = $alt_text;
+			} else {
+				// Fallback to attachment title
+				$attachment_title_text = get_the_title( $image_id );
+				if ( ! empty( $attachment_title_text ) ) {
+					$image_alt = $attachment_title_text;
+					$image_title = $attachment_title_text;
+				}
+			}
+		}
+	}
+	
+	return array(
+		'alt'   => $image_alt,
+		'title' => $image_title,
+	);
+}
+
+/**
+ * Helper function to safely get page URL by slug
+ *
+ * @param string $page_slug The page slug to find
+ * @return string|false The page URL or false if not found
+ */
+function gregstuart_get_page_url_by_slug( $page_slug ) {
+	$page = get_page_by_path( $page_slug );
+	return $page ? get_permalink( $page ) : false;
+}
+
+/**
+ * Customize Register - Add contact information settings
+ *
+ * @param WP_Customize_Manager $wp_customize Theme Customizer object.
+ */
+function gregstuart_customize_register( $wp_customize ) {
+	// Add Contact Information Section
+	$wp_customize->add_section( 'gregstuart_contact_info', array(
+		'title'    => __( 'Contact Information', 'gregstuart-custom-theme' ),
+		'priority' => 30,
+	) );
+
+	// Contact Name Setting
+	$wp_customize->add_setting( 'gregstuart_contact_name', array(
+		'default'           => 'Greg Stuart',
+		'sanitize_callback' => 'sanitize_text_field',
+	) );
+
+	$wp_customize->add_control( 'gregstuart_contact_name', array(
+		'label'   => __( 'Contact Name', 'gregstuart-custom-theme' ),
+		'section' => 'gregstuart_contact_info',
+		'type'    => 'text',
+	) );
+
+	// Contact Email Setting
+	$wp_customize->add_setting( 'gregstuart_contact_email', array(
+		'default'           => 'greg@stuarturbandesign.com',
+		'sanitize_callback' => 'sanitize_email',
+	) );
+
+	$wp_customize->add_control( 'gregstuart_contact_email', array(
+		'label'   => __( 'Contact Email', 'gregstuart-custom-theme' ),
+		'section' => 'gregstuart_contact_info',
+		'type'    => 'email',
+	) );
+
+	// Site Manager Name Setting
+	$wp_customize->add_setting( 'gregstuart_site_manager_name', array(
+		'default'           => 'Christian Cutter',
+		'sanitize_callback' => 'sanitize_text_field',
+	) );
+
+	$wp_customize->add_control( 'gregstuart_site_manager_name', array(
+		'label'   => __( 'Site Manager Name', 'gregstuart-custom-theme' ),
+		'section' => 'gregstuart_contact_info',
+		'type'    => 'text',
+	) );
+
+	// Site Manager URL Setting
+	$wp_customize->add_setting( 'gregstuart_site_manager_url', array(
+		'default'           => 'https://gravatar.com/christianbcutter',
+		'sanitize_callback' => 'esc_url_raw',
+	) );
+
+	$wp_customize->add_control( 'gregstuart_site_manager_url', array(
+		'label'   => __( 'Site Manager URL', 'gregstuart-custom-theme' ),
+		'section' => 'gregstuart_contact_info',
+		'type'    => 'url',
+	) );
+}
+add_action( 'customize_register', 'gregstuart_customize_register' );
+
+/**
+ * RECOMMENDED PLUGIN SETUP FOR DRAG-AND-DROP ARTWORK ORDERING
+ * 
+ * To enable easy reordering of artworks for Greg:
+ * 
+ * 1. Install the "Post Types Order" plugin: https://wordpress.org/plugins/post-types-order/
+ * 2. Go to Settings > Post Types Order in WordPress admin
+ * 3. Check the box next to "Artworks" to enable ordering
+ * 4. A new menu item "Artworks > Re-order" will appear
+ * 5. Greg can drag and drop artworks to reorder them
+ * 
+ * Your theme is already configured to respect this custom ordering via 'menu_order' in queries.
+ */
 
 ?>

@@ -17,18 +17,11 @@ get_header();
 		// --- Hero Section ---
 		// Assumes ACF field 'hero_cover_photo' returns an Image URL.
 		$hero_image_url = get_field('hero_cover_photo');
-		$hero_image_alt = '';
-
-		if ($hero_image_url) {
-			// Attempt to get alt text from the image attachment details.
-			$hero_image_id = attachment_url_to_postid($hero_image_url);
-			if ($hero_image_id) {
-				$hero_image_alt = get_post_meta($hero_image_id, '_wp_attachment_image_alt', true);
-			}
-		}
-		if (empty($hero_image_alt)) {
-			$hero_image_alt = "Hero graphic for Greg Stuart Fine Arts";
-		}
+		$hero_image_data = gregstuart_get_image_alt_title( 
+			$hero_image_url, 
+			'Hero graphic for Greg Stuart Fine Arts', 
+			'Hero Cover Photo' 
+		);
 		?>
 		<section class="hero">
 			<div class="image-container">
@@ -36,8 +29,8 @@ get_header();
 					<a href="<?php echo esc_url( $hero_image_url ); ?>"
 					   class="glightbox"
 					   data-gallery="hero-cover"
-					   data-title="<?php echo esc_attr( $hero_image_alt ); ?>">
-						<img src="<?php echo esc_url( $hero_image_url ); ?>" alt="<?php echo esc_attr( $hero_image_alt ); ?>" class="hero-image" />
+					   data-title="<?php echo esc_attr( $hero_image_data['title'] ); ?>">
+						<img src="<?php echo esc_url( $hero_image_url ); ?>" alt="<?php echo esc_attr( $hero_image_data['alt'] ); ?>" class="hero-image" />
 					</a>
 				<?php else : ?>
 					<div class="hero-image-placeholder"><?php esc_html_e( 'Cover photo not found', 'gregstuart-custom-theme' ); ?></div>
@@ -53,32 +46,19 @@ get_header();
 		$artwork_grid_images = [];
 		for ( $i = 1; $i <= 5; $i++ ) {
 			$image_url = get_field( 'artwork_grid_image_' . $i );
-			$image_alt = 'Artwork Grid Image ' . $i; 
-			$image_title = 'Artwork ' . $i; 
-
-			if ($image_url) {
-				$image_id = attachment_url_to_postid($image_url);
-				if ($image_id) {
-					$alt_text = get_post_meta($image_id, '_wp_attachment_image_alt', true);
-					if (!empty($alt_text)) {
-						$image_alt = $alt_text;
-						$image_title = $alt_text; 
-					} else {
-						$attachment_title_text = get_the_title($image_id);
-						if (!empty($attachment_title_text)) {
-							$image_alt = $attachment_title_text; 
-							$image_title = $attachment_title_text; 
-						}
-					}
-				}
-			}
+			$image_data = gregstuart_get_image_alt_title( 
+				$image_url, 
+				'Artwork Grid Image ' . $i, 
+				'Artwork ' . $i 
+			);
+			
 			$artwork_grid_images[] = [
 				'url'   => $image_url,
-				'alt'   => $image_alt,
-				'title' => $image_title,
+				'alt'   => $image_data['alt'],
+				'title' => $image_data['title'],
 			];
 		}
-		$gallery_page_url = get_permalink( get_page_by_path( 'gallery' ) );
+		$gallery_page_url = gregstuart_get_page_url_by_slug( 'gallery' );
 		?>
 		<section class="artwork-grid-section">
 			<div class="artwork-grid">
@@ -121,11 +101,11 @@ get_header();
 					'terms'    => 'sketch',
 				),
 			),
-			'orderby'        => 'menu_order', // Use custom order
+			'orderby'        => 'menu_order date', // Added fallback ordering
 			'order'          => 'ASC',        // Typically ASC for menu_order
 		);
 		$sketch_query = new WP_Query( $sketch_args );
-		$sketches_page_url = get_permalink( get_page_by_path( 'sketches' ) ); 
+		$sketches_page_url = gregstuart_get_page_url_by_slug( 'sketches' );
 
 		if ( $sketch_query->have_posts() ) :
 		?>

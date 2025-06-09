@@ -11,27 +11,31 @@
 ?>
 		</main><footer id="colophon" class="site-footer contact-footer"> <?php // Added 'contact-footer' class ?>
 			<div class="contact-footer-info">
-				<p class="contact-footer-name">Greg Stuart</p>
+				<p class="contact-footer-name"><?php echo esc_html( get_theme_mod( 'gregstuart_contact_name', 'Greg Stuart' ) ); ?></p>
 				<p class="contact-footer-email">
-					<a href="mailto:greg@stuarturbandesign.com">greg@stuarturbandesign.com</a>
+					<a href="mailto:<?php echo esc_attr( get_theme_mod( 'gregstuart_contact_email', 'greg@stuarturbandesign.com' ) ); ?>">
+						<?php echo esc_html( get_theme_mod( 'gregstuart_contact_email', 'greg@stuarturbandesign.com' ) ); ?>
+					</a>
 				</p>
 				<?php
 				// Get the URL of the 'About' page.
 				// This assumes you have a page with the slug 'about'.
 				// If your 'About' page has a different slug, change 'about' accordingly.
-				$about_page = get_page_by_path( 'about' );
-				if ( $about_page ) :
+				$about_page_url = gregstuart_get_page_url_by_slug( 'about' );
+				if ( $about_page_url ) :
 				?>
 				<p class="contact-footer-about">
-					<a href="<?php echo esc_url( get_permalink( $about_page->ID ) ); ?>">Learn more about Greg Stuart</a>
+					<a href="<?php echo esc_url( $about_page_url ); ?>">
+						<?php printf( esc_html__( 'Learn more about %s', 'gregstuart-custom-theme' ), esc_html( get_theme_mod( 'gregstuart_contact_name', 'Greg Stuart' ) ) ); ?>
+					</a>
 				</p>
 				<?php endif; ?>
 			</div>
 			<div class="contact-footer-credit">
 				<p>
-					Site Managed by
-					<a href="https://gravatar.com/christianbcutter" target="_blank" rel="noopener noreferrer">
-						Christian Cutter
+					<?php esc_html_e( 'Site Managed by', 'gregstuart-custom-theme' ); ?>
+					<a href="<?php echo esc_url( get_theme_mod( 'gregstuart_site_manager_url', 'https://gravatar.com/christianbcutter' ) ); ?>" target="_blank" rel="noopener noreferrer">
+						<?php echo esc_html( get_theme_mod( 'gregstuart_site_manager_name', 'Christian Cutter' ) ); ?>
 					</a>
 				</p>
 			</div>
